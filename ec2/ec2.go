@@ -15,7 +15,7 @@ import (
 	"encoding/hex"
 	"encoding/xml"
 	"fmt"
-	"github.com/mitchellh/goamz/aws"
+	"github.com/LessThanThreeLabs/goamz/aws"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -899,11 +899,15 @@ func (ec2 *EC2) CreateImage(options *CreateImage) (resp *CreateImageResp, err er
 // a very large number of images being returned.
 //
 // See http://goo.gl/SRBhW for more details.
-func (ec2 *EC2) Images(ids []string, filter *Filter) (resp *ImagesResp, err error) {
+func (ec2 *EC2) Images(ids []string, owners []string, filter *Filter) (resp *ImagesResp, err error) {
 	params := makeParams("DescribeImages")
 	for i, id := range ids {
 		params["ImageId."+strconv.Itoa(i+1)] = id
 	}
+        for i, owner := range owners {
+                params[fmt.Sprintf("Owner.%d", i+1)] = owner
+        }
+
 	filter.addParams(params)
 
 	resp = &ImagesResp{}
